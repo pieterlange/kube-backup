@@ -10,7 +10,7 @@ Setup
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
   * `NAMESPACES` - List of namespaces to export. Default: all
-  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc secrets ds thirdpartyresource networkpolicy statefulset storageclass job`
+  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc secrets ds thirdpartyresource networkpolicy statefulset storageclass cronjob`
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
 
