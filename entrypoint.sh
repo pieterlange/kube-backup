@@ -24,7 +24,7 @@ for namespace in $NAMESPACES; do
     /kubectl --namespace="${namespace}" get --export -o=json $type | jq --sort-keys \
         'select(.type!="kubernetes.io/service-account-token") |
         del(
-            .items[].annotations."kubectl.kubernetes.io/last-applied-configuration"
+            .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
             .items[].spec.clusterIP,
             .items[].metadata.uid,
             .items[].metadata.selfLink,
