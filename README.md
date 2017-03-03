@@ -1,39 +1,41 @@
 kube-backup
 ===========
+[![Docker Repository on Quay](https://quay.io/repository/digidentity/kube-backup/status "Docker Repository on Quay")](https://quay.io/repository/digidentity/kube-backup)
+[![Docker Repository on Docker Hub](https://img.shields.io/docker/automated/ptlange/kube-backup.svg "Docker Repository on Docker Hub")](https://hub.docker.com/r/ptlange/kube-backup/)
+
 Quick 'n dirty kubernetes state backup script, designed to be ran as kubernetes Job. Think of it like [RANCID](http://www.shrubbery.net/rancid/) for kubernetes.
 
 Props to @gianrubio for coming up with the idea.
 
-
 Setup
 -----
-Deployment example used the kubernetes [`CronJob` primitive](cronjob.yaml) and will push a backup to git every 10 minutes.
+Use the [deployment example](cronjob.yaml) and deploy a kubernetes `CronJob` primitive in your kubernetes (1.5 and up) cluster ensuring backups of kubernetes resource definitions to your private git repo.
 
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
   * `NAMESPACES` - List of namespaces to export. Default: all
-  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc secrets ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
+  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
 
 Mount a configured ssh directory in `/backup/.ssh` with the following files:
   * `known_hosts` - Preloaded with SSH host key of `$GIT_REPO` host.
-  * `id_rsa` - SSH private key of user allowed to push to `$GIT_REPO`
+  * `id_rsa` - SSH private key of user allowed to push to `$GIT_REPO`.
 
 Easiest way of doing this is:
 ```bash
-mkdir ssh_secret
-cd ssh_secret
 ssh-keygen -f ./id_rsa
 ssh-keyscan $YOUR_GIT_HOST > known_hosts
 
 kubectl create secret generic kube-backup-ssh -n kube-system --from-file=id_rsa --from-file=known_hosts
 ```
 
+Optional:
+  * Modify the snapshot frequency in `spec.schedule` using the [cron format](https://en.wikipedia.org/wiki/Cron).
 
 Result
 ------
-All listed resources will exported into the following directory tree structure.
+All configured resources will be exported into a directory tree structure in `kind: List` YAML format following a `$namespace/$resourcetype.yaml` file structure.
 
 ```
 .
@@ -49,7 +51,6 @@ All listed resources will exported into the following directory tree structure.
 │   ├── statefulset.yaml
 │   ├── storageclass.yaml
 │   ├── svc.yaml
-│   ├── thirdpartyobject.yaml
 │   └── thirdpartyresource.yaml
 ├── kube-system
 │   ├── configmap.yaml
@@ -63,7 +64,6 @@ All listed resources will exported into the following directory tree structure.
 │   ├── statefulset.yaml
 │   ├── storageclass.yaml
 │   ├── svc.yaml
-│   ├── thirdpartyobject.yaml
 │   └── thirdpartyresource.yaml
 ├── prd
 │   ├── configmap.yaml
@@ -77,7 +77,6 @@ All listed resources will exported into the following directory tree structure.
 │   ├── statefulset.yaml
 │   ├── storageclass.yaml
 │   ├── svc.yaml
-│   ├── thirdpartyobject.yaml
 │   └── thirdpartyresource.yaml
 └── staging
     ├── configmap.yaml
@@ -91,8 +90,11 @@ All listed resources will exported into the following directory tree structure.
     ├── statefulset.yaml
     ├── storageclass.yaml
     ├── svc.yaml
-    ├── thirdpartyobject.yaml
     └── thirdpartyresource.yaml
 
-8 directories, 120 files
+4 directories, 48 files
 ```
+
+Caveat
+------
+This is using a kubernetes alpha feature ([cronjobs](https://kubernetes.io/docs/user-guide/jobs/#handling-pod-and-container-failures)) and hasn't been tested for idempotency/concurrent behaviour.  See the cronjob [documentation](https://kubernetes.io/docs/user-guide/cron-jobs/) for details.
