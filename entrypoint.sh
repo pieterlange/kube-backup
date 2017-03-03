@@ -20,7 +20,7 @@ for namespace in $NAMESPACES; do
   [ -d /backup/git/${namespace} ] || mkdir -p /backup/git/${namespace}
 
   for type in $RESOURCETYPES; do
-    echo "[${namespace}] Exporting resources: ${type}"
+    echo "[${namespace}] Exporting resources: ${type}" > /dev/stderr
     /kubectl --namespace="${namespace}" get --export -o=json $type | jq --sort-keys \
         'select(.type!="kubernetes.io/service-account-token") |
         del(
