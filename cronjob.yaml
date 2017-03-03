@@ -1,0 +1,42 @@
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: kube-state-backup
+  namespace: kube-system
+  labels:
+    app: kube-backup
+spec:
+  schedule: "*/10 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: kube-backup
+          name: kube-backup
+        spec:
+          containers:
+          - image: ptlange/kube-backup:latest
+            imagePullPolicy: Always
+            name: backup
+            resources: {}
+            env:
+            - name: GIT_REPO
+              value: "git@git.example.com:infra/kube-backup.git"
+            - name: RESOURCETYPES
+              value: "ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"
+            volumeMounts:
+            - mountPath: /backup/
+              name: cache
+            - mountPath: /backup/.ssh
+              name: sshkey
+          dnsPolicy: ClusterFirst
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: sshkey
+            secret:
+              defaultMode: 420
+              secretName: kube-backup-ssh
+          - name: cache
+            emptyDir: {}
+          restartPolicy: OnFailure

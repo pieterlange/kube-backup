@@ -7,6 +7,8 @@ Props to @gianrubio for coming up with the idea.
 
 Setup
 -----
+Deployment example used the kubernetes [`CronJob` primitive](cronjob.yaml) and will push a backup to git every 10 minutes.
+
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
   * `NAMESPACES` - List of namespaces to export. Default: all
