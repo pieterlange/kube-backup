@@ -12,7 +12,7 @@ Deployment example used the kubernetes [`CronJob` primitive](cronjob.yaml) and w
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
   * `NAMESPACES` - List of namespaces to export. Default: all
-  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc secrets ds thirdpartyresource networkpolicy statefulset storageclass cronjob`
+  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc secrets ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
 
@@ -28,4 +28,71 @@ ssh-keygen -f ./id_rsa
 ssh-keyscan $YOUR_GIT_HOST > known_hosts
 
 kubectl create secret generic kube-backup-ssh -n kube-system --from-file=id_rsa --from-file=known_hosts
+```
+
+
+Result
+------
+All listed resources will exported into the following directory tree structure.
+
+```
+.
+├── default
+│   ├── configmap.yaml
+│   ├── cronjob.yaml
+│   ├── deployment.yaml
+│   ├── ds.yaml
+│   ├── ingress.yaml
+│   ├── networkpolicy.yaml
+│   ├── petset.yaml
+│   ├── rc.yaml
+│   ├── statefulset.yaml
+│   ├── storageclass.yaml
+│   ├── svc.yaml
+│   ├── thirdpartyobject.yaml
+│   └── thirdpartyresource.yaml
+├── kube-system
+│   ├── configmap.yaml
+│   ├── cronjob.yaml
+│   ├── deployment.yaml
+│   ├── ds.yaml
+│   ├── ingress.yaml
+│   ├── networkpolicy.yaml
+│   ├── petset.yaml
+│   ├── rc.yaml
+│   ├── statefulset.yaml
+│   ├── storageclass.yaml
+│   ├── svc.yaml
+│   ├── thirdpartyobject.yaml
+│   └── thirdpartyresource.yaml
+├── prd
+│   ├── configmap.yaml
+│   ├── cronjob.yaml
+│   ├── deployment.yaml
+│   ├── ds.yaml
+│   ├── ingress.yaml
+│   ├── networkpolicy.yaml
+│   ├── petset.yaml
+│   ├── rc.yaml
+│   ├── statefulset.yaml
+│   ├── storageclass.yaml
+│   ├── svc.yaml
+│   ├── thirdpartyobject.yaml
+│   └── thirdpartyresource.yaml
+└── staging
+    ├── configmap.yaml
+    ├── cronjob.yaml
+    ├── deployment.yaml
+    ├── ds.yaml
+    ├── ingress.yaml
+    ├── networkpolicy.yaml
+    ├── petset.yaml
+    ├── rc.yaml
+    ├── statefulset.yaml
+    ├── storageclass.yaml
+    ├── svc.yaml
+    ├── thirdpartyobject.yaml
+    └── thirdpartyresource.yaml
+
+8 directories, 120 files
 ```
