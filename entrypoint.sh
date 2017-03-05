@@ -31,11 +31,7 @@ for namespace in $NAMESPACES; do
             .items[].metadata.resourceVersion,
             .items[].metadata.creationTimestamp,
             .items[].metadata.generation,
-            .items[].status,
-            .items[].spec.template.spec.securityContext,
-            .items[].spec.template.spec.dnsPolicy,
-            .items[].spec.template.spec.terminationGracePeriodSeconds,
-            .items[].spec.template.spec.restartPolicy
+            .items[].status
         )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > /backup/git/${namespace}/${type}.yaml
   done
 done
