@@ -14,9 +14,8 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 
 git config --global user.name $GIT_USERNAME
 git config --global user.email $GIT_EMAIL
-git clone --depth 1 $GIT_REPO /backup/git
+git clone --depth 1 $GIT_REPO /backup/git --branch $GIT_BRANCH
 cd /backup/git/
-git checkout $GIT_BRANCH
 
 # Start kubernetes state export
 for namespace in $NAMESPACES; do
