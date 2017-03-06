@@ -10,10 +10,13 @@ RESOURCETYPES=${RESOURCETYPES:-"ingress deployment configmap svc rc ds thirdpart
 [ -z $GIT_REPO ] && echo "Need to define GIT_REPO environment variable" && exit 1
 GIT_USERNAME=${GIT_USERNAME:-kube-backup}
 GIT_EMAIL=${GIT_EMAIL:-kube-backup@example.com}
+GIT_BRANCH=${GIT_BRANCH:-master}
 
 git config --global user.name $GIT_USERNAME
 git config --global user.email $GIT_EMAIL
 git clone --depth 1 $GIT_REPO /backup/git
+cd /backup/git/
+git checkout $GIT_BRANCH
 
 # Start kubernetes state export
 for namespace in $NAMESPACES; do
@@ -36,7 +39,6 @@ for namespace in $NAMESPACES; do
   done
 done
 
-cd /backup/git/
 git add .
 git commit -m "Automatic backup at $(date)"
 git push
