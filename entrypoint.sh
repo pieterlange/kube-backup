@@ -23,7 +23,13 @@ for namespace in $NAMESPACES; do
 
   for type in $RESOURCETYPES; do
     echo "[${namespace}] Exporting resources: ${type}" > /dev/stderr
-    /kubectl --namespace="${namespace}" get --export -o=json $type | jq --sort-keys \
+
+    label_selector=""
+    if [[ $type == 'configmap' && -z "${INCLUDE_TILLER_CONFIGMAPS:-}" ]]; then
+      label_selector="-l OWNER!=TILLER"
+    fi
+
+    /kubectl --namespace="${namespace}" get --export -o=json $type $label_selector | jq --sort-keys \
         'select(.type!="kubernetes.io/service-account-token") |
         del(
             .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
