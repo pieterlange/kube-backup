@@ -4,7 +4,7 @@ if [ -z $NAMESPACES ]; then
   NAMESPACES=$(/kubectl get ns -o jsonpath={.items[*].metadata.name})
 fi
 
-RESOURCETYPES=${RESOURCETYPES:-"ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"}
+RESOURCETYPES=${RESOURCETYPES:-"ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob ns"}
 
 # Initialize git repo
 [ -z $GIT_REPO ] && echo "Need to define GIT_REPO environment variable" && exit 1
