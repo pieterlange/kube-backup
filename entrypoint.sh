@@ -17,11 +17,12 @@ git config --global user.name $GIT_USERNAME
 git config --global user.email $GIT_EMAIL
 git clone --depth 1 $GIT_REPO /backup/git --branch $GIT_BRANCH
 cd /backup/git/
+git rm -r .
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
-  echo "Exporting resource: ${type}" > /dev/stderr
-  /kubectl --namespace="${namespace}" get --export -o=json $resource | jq --sort-keys \
+  echo "Exporting resource: ${resource}" > /dev/stderr
+  /kubectl get --export -o=json $resource | jq --sort-keys \
       'del(
           .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
           .items[].metadata.uid,
