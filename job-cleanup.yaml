@@ -17,7 +17,7 @@ spec:
           restartPolicy: Never
           containers:
           - name: kubectl
-            image: quay.io/coreos/hyperkube:v1.5.3_coreos.0
+            image: quay.io/coreos/hyperkube:v1.5.4_coreos.0
             command: [ '/bin/bash', '-c', '/hyperkube kubectl get jobs -l app=kube-backup -o name | xargs /hyperkube kubectl delete' ]
             resources:
               requests:

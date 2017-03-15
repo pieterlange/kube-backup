@@ -1,7 +1,7 @@
 #!/bin/sh
 
 set -ex
-KUBECTL_VERSION=1.5.3
+KUBECTL_VERSION=1.5.4
 
 get_bin()
 {
@@ -17,7 +17,7 @@ apk add --update bash easy-rsa git openssh-client curl ca-certificates jq python
 
 pip install ijson
 
-get_bin 9cfc6cfb959d934cc8080c2dea1e5a6490fd29e592718c5b2b2cfda5f92e787e \
+get_bin 1d9be6531f9830798b94d2a3ba6d07592ac664b8e12a8ddf201dd815719b9563 \
     "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
 
 adduser -h /backup -D backup

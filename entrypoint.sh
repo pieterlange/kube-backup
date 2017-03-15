@@ -5,7 +5,7 @@ if [ -z $NAMESPACES ]; then
 fi
 
 RESOURCETYPES=${RESOURCETYPES:-"ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"}
-GLOBALRESOURCES=${GLOBALRESOURCES:-"namespace"}
+GLOBALRESOURCES=${GLOBALRESOURCES:-"namespace storageclasses"}
 
 # Initialize git repo
 [ -z $GIT_REPO ] && echo "Need to define GIT_REPO environment variable" && exit 1
