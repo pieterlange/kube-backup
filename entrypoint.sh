@@ -5,6 +5,7 @@ if [ -z $NAMESPACES ]; then
 fi
 
 RESOURCETYPES=${RESOURCETYPES:-"ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"}
+GLOBALRESOURCES=${GLOBALRESOURCES:-"namespace"}
 
 # Initialize git repo
 [ -z $GIT_REPO ] && echo "Need to define GIT_REPO environment variable" && exit 1
@@ -18,6 +19,19 @@ git clone --depth 1 $GIT_REPO /backup/git --branch $GIT_BRANCH
 cd /backup/git/
 
 # Start kubernetes state export
+for resource in $GLOBALRESOURCES; do
+  echo "Exporting resource: ${type}" > /dev/stderr
+  /kubectl --namespace="${namespace}" get --export -o=json $resource | jq --sort-keys \
+      'del(
+          .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+          .items[].metadata.uid,
+          .items[].metadata.selfLink,
+          .items[].metadata.resourceVersion,
+          .items[].metadata.creationTimestamp,
+          .items[].metadata.generation,
+      )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > /backup/git/${resource}.yaml
+done
+
 for namespace in $NAMESPACES; do
   [ -d /backup/git/${namespace} ] || mkdir -p /backup/git/${namespace}
 

@@ -14,7 +14,8 @@ Use the [deployment example](cronjob.yaml) and deploy a kubernetes `CronJob` pri
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
   * `NAMESPACES` - List of namespaces to export. Default: all
-  * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
+  * `GLOBALRESOURCES` - List of global resource types to export. Default: `namespace`
+  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
   * `GIT_BRANCH` - Use a specific git branch . Default: `master`
