@@ -17,6 +17,7 @@ Define the following environment parameters:
   * `RESOURCE_TYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
+  * `GIT_BRANCH` - Use a specific git branch . Default: `master`
 
 Mount a configured ssh directory in `/backup/.ssh` with the following files:
   * `known_hosts` - Preloaded with SSH host key of `$GIT_REPO` host.
@@ -98,3 +99,5 @@ All configured resources will be exported into a directory tree structure in `ki
 Caveat
 ------
 This is using a kubernetes alpha feature ([cronjobs](https://kubernetes.io/docs/user-guide/jobs/#handling-pod-and-container-failures)) and hasn't been tested for idempotency/concurrent behaviour.  See the cronjob [documentation](https://kubernetes.io/docs/user-guide/cron-jobs/) for details.
+
+Running an export every 10 minutes quickly runs up your Job (and therefor Pod) count, causing a lineair increase in master server load. A fix for this is planned in kubernetes 1.7, until then you can opt to deploy a [blunt instrument](job-cleanup.yaml) to clean the old kube-backup jobs.
