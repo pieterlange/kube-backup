@@ -6,19 +6,21 @@ metadata:
   labels:
     app: kube-backup-cleaner
 spec:
-  schedule: "* 3 * * *"
+  schedule: "* 6 * * *"
   concurrencyPolicy: Replace
   jobTemplate:
     spec:
       template:
         metadata:
           name: job-cleanup
+          labels:
+            app: kube-backup-cleaner
         spec:
-          restartPolicy: Never
+          restartPolicy: OnFailure
           containers:
           - name: kubectl
             image: quay.io/coreos/hyperkube:v1.5.4_coreos.0
-            command: [ '/bin/bash', '-c', '/hyperkube kubectl get jobs -l app=kube-backup -o name | xargs /hyperkube kubectl delete' ]
+            command: [ '/bin/bash', '-c', '/hyperkube kubectl get jobs -l app=kube-backup -o name --sort-by=metadata.creationTimestamp | head -n -2 | xargs /hyperkube kubectl delete; exit 0' ]
             resources:
               requests:
                 cpu: 0.1
