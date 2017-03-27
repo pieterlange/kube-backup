@@ -6,7 +6,7 @@ metadata:
   labels:
     app: kube-backup-cleaner
 spec:
-  schedule: "* 6 * * *"
+  schedule: "1 6 * * *"
   concurrencyPolicy: Replace
   jobTemplate:
     spec:
