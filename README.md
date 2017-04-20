@@ -34,6 +34,7 @@ kubectl create secret generic kube-backup-ssh -n kube-system --from-file=id_rsa 
 
 Optional:
   * Modify the snapshot frequency in `spec.schedule` using the [cron format](https://en.wikipedia.org/wiki/Cron).
+  * Modify the number of successful and failed finished jobs to retain in `spec.successfulJobsHistoryLimit` and `spec.failedJobsHistoryLimit`.
 
 Result
 ------
@@ -101,4 +102,4 @@ Caveat
 ------
 This is using a kubernetes alpha feature ([cronjobs](https://kubernetes.io/docs/user-guide/jobs/#handling-pod-and-container-failures)) and hasn't been tested for idempotency/concurrent behaviour.  See the cronjob [documentation](https://kubernetes.io/docs/user-guide/cron-jobs/) for details.
 
-Running an export every 10 minutes quickly runs up your Job (and therefor Pod) count, causing a lineair increase in master server load. A fix for this is planned in kubernetes 1.7, until then you can opt to deploy a [blunt instrument](job-cleanup.yaml) to clean the old kube-backup jobs.
+If your kubernetes cluster runs under version 1.5 or less, `spec.successfulJobsHistoryLimit` and `spec.failedJobsHistoryLimit` will be ignored as they've been introduced in version 1.6. In this case, running an export every 10 minutes will quickly run up your Job (and therefor Pod) count, causing a linear increase in master server load. A fix for this is to deploy a [blunt instrument](job-cleanup.yaml) to clean the old kube-backup jobs.
