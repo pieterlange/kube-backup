@@ -35,6 +35,7 @@ kubectl create secret generic kube-backup-ssh -n kube-system --from-file=id_rsa 
 Optional:
   * Modify the snapshot frequency in `spec.schedule` using the [cron format](https://en.wikipedia.org/wiki/Cron).
   * Modify the number of successful and failed finished jobs to retain in `spec.successfulJobsHistoryLimit` and `spec.failedJobsHistoryLimit`.
+  * If using RBAC (1.6+), use the ClusterRole and ClusterRoleBindings in rbac.yaml.
 
 Result
 ------
