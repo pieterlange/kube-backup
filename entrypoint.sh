@@ -13,6 +13,10 @@ GIT_USERNAME=${GIT_USERNAME:-kube-backup}
 GIT_EMAIL=${GIT_EMAIL:-kube-backup@example.com}
 GIT_BRANCH=${GIT_BRANCH:-master}
 
+if [[ ! -f /backup/.ssh/id_rsa ]] ; then
+    git config --global credential.helper '!aws codecommit credential-helper $@'
+    git config --global credential.UseHttpPath true
+fi
 git config --global user.name $GIT_USERNAME
 git config --global user.email $GIT_EMAIL
 

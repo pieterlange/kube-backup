@@ -9,7 +9,7 @@ Props to @gianrubio for coming up with the idea.
 
 Setup
 -----
-Use the [deployment example](cronjob.yaml) and deploy a kubernetes `CronJob` primitive in your kubernetes (1.5 and up) cluster ensuring backups of kubernetes resource definitions to your private git repo.
+Use the deployment example ([ssh](cronjob-ssh.yaml) or [AWS CodeCommit](cronjob-codecommit.yaml) authentication) and deploy a kubernetes `CronJob` primitive in your kubernetes (1.5 and up) cluster ensuring backups of kubernetes resource definitions to your private git repo.
 
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
@@ -20,17 +20,42 @@ Define the following environment parameters:
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
   * `GIT_BRANCH` - Use a specific git branch . Default: `master`
 
-Mount a configured ssh directory in `/backup/.ssh` with the following files:
-  * `known_hosts` - Preloaded with SSH host key of `$GIT_REPO` host.
-  * `id_rsa` - SSH private key of user allowed to push to `$GIT_REPO`.
+Chose one of two authentication mechanisms:
 
-Easiest way of doing this is:
-```bash
-ssh-keygen -f ./id_rsa
-ssh-keyscan $YOUR_GIT_HOST > known_hosts
+  * If using AWS CodeCommit and policy-based access from AWS, modify your cluster configuration to provide GitPull and GitPush access for that CodeCommit repo to your cluster. If using `kops`, the configuration will look something like this:
 
-kubectl create secret generic kube-backup-ssh -n kube-system --from-file=id_rsa --from-file=known_hosts
-```
+  ```yaml
+    additionalPolicies:
+      node: |
+        [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "codecommit:GitPull",
+              "codecommit:GitPush"
+            ],
+            "Resource": "arn:aws:codecommit:<region>:<account name>:<repo-name>"
+          }
+        ]
+  ```
+
+  NOTE: in this deployment, the ssh volume and secret are not present.
+
+
+  * If using a different repository (GitHub, BitBucket, etc.), mount a configured ssh directory in `/backup/.ssh` with the following files:
+
+    * `known_hosts` - Preloaded with SSH host key of `$GIT_REPO` host.
+    * `id_rsa` - SSH private key of user allowed to push to `$GIT_REPO`.
+
+  Easiest way of doing this is:
+  ```bash
+  ssh-keygen -f ./id_rsa
+  ssh-keyscan $YOUR_GIT_HOST > known_hosts
+
+  kubectl create secret generic kube-backup-ssh -n kube-system --from-file=id_rsa --from-file=known_hosts
+  ```
+
+  NOTE: If `id_rsa` isn't found in your ssh directory, the backup script will assume you're using AWS CodeCommit.
 
 Optional:
   * Modify the snapshot frequency in `spec.schedule` using the [cron format](https://en.wikipedia.org/wiki/Cron).
