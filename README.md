@@ -103,3 +103,7 @@ Caveat
 This is using a kubernetes alpha feature ([cronjobs](https://kubernetes.io/docs/user-guide/jobs/#handling-pod-and-container-failures)) and hasn't been tested for idempotency/concurrent behaviour.  See the cronjob [documentation](https://kubernetes.io/docs/user-guide/cron-jobs/) for details.
 
 If your kubernetes cluster runs under version 1.5 or less, `spec.successfulJobsHistoryLimit` and `spec.failedJobsHistoryLimit` will be ignored as they've been introduced in version 1.6. In this case, running an export every 10 minutes will quickly run up your Job (and therefor Pod) count, causing a linear increase in master server load. A fix for this is to deploy a [blunt instrument](job-cleanup.yaml) to clean the old kube-backup jobs.
+
+License
+-------
+This project is MIT licensed.
