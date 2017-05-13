@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-backup
+  namespace: kube-system
+
+---
+
 apiVersion: batch/v2alpha1
 kind: CronJob
 metadata:
@@ -35,6 +43,7 @@ spec:
               name: sshkey
           dnsPolicy: ClusterFirst
           terminationGracePeriodSeconds: 30
+          serviceAccountName: kube-backup
           volumes:
           - name: sshkey
             secret:
