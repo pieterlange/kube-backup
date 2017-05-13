@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 if [ -z $NAMESPACES ]; then
   NAMESPACES=$(/kubectl get ns -o jsonpath={.items[*].metadata.name})
@@ -15,9 +15,11 @@ GIT_BRANCH=${GIT_BRANCH:-master}
 
 git config --global user.name $GIT_USERNAME
 git config --global user.email $GIT_EMAIL
-git clone --depth 1 $GIT_REPO /backup/git --branch $GIT_BRANCH
+
+test -d /backup/git/ || git clone --depth 1 $GIT_REPO /backup/git --branch $GIT_BRANCH || git clone $GIT_REPO /backup/git
 cd /backup/git/
-git rm -r .
+git checkout ${GIT_BRANCH} || git checkout -b ${GIT_BRANCH}
+git rm -r . || true
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
@@ -59,6 +61,10 @@ for namespace in $NAMESPACES; do
   done
 done
 
-git add .
-git commit -m "Automatic backup at $(date)"
-git push
+if git diff-index --quiet HEAD -- ; then
+    git add .
+    git commit -m "Automatic backup at $(date)"
+    git push origin ${GIT_BRANCH}
+else
+    echo "No change"
+fi
