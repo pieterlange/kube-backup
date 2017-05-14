@@ -22,7 +22,7 @@ RUN apk update && \
 RUN curl -SL ${KUBECTL_URI} -o kubectl && chmod +x kubectl
 RUN echo "${KUBECTL_SHA256}  kubectl" | sha256sum -c - || exit 10
 
-RUN pip install ijson
+RUN pip install ijson awscli
 RUN adduser -h /backup -D backup
 
 COPY entrypoint.sh /
