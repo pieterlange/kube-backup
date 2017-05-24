@@ -65,8 +65,9 @@ for namespace in $NAMESPACES; do
   done
 done
 
+git add .
+
 if ! git diff-index --quiet HEAD -- ; then
-    git add .
     git commit -m "Automatic backup at $(date)"
     git push origin ${GIT_BRANCH}
 else
