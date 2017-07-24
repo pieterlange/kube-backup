@@ -17,8 +17,8 @@ if [[ ! -f /backup/.ssh/id_rsa ]] ; then
     git config --global credential.helper '!aws codecommit credential-helper $@'
     git config --global credential.UseHttpPath true
 fi
-git config --global user.name $GIT_USERNAME
-git config --global user.email $GIT_EMAIL
+git config --global user.name "$GIT_USERNAME"
+git config --global user.email "$GIT_EMAIL"
 
 test -d /backup/git/ || git clone --depth 1 $GIT_REPO /backup/git --branch $GIT_BRANCH || git clone $GIT_REPO /backup/git
 cd /backup/git/
