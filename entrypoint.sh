@@ -10,7 +10,7 @@ GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclasses"}"
 # Initialize git repo
 [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
 GIT_REPO_PATH="${GIT_REPO_PATH:-"/backup/git"}"
-GIT_PREFIX_PATH="${GIT_PREFIX_PATH:-""}"
+GIT_PREFIX_PATH="${GIT_PREFIX_PATH:-"."}"
 GIT_USERNAME="${GIT_USERNAME:-"kube-backup"}"
 GIT_EMAIL="${GIT_EMAIL:-"kube-backup@example.com"}"
 GIT_BRANCH="${GIT_BRANCH:-"master"}"
@@ -25,7 +25,7 @@ git config --global user.email "$GIT_EMAIL"
 test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH"
 cd "$GIT_REPO_PATH"
 git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}"
-git rm -r . || true
+git rm -r "${GIT_PREFIX_PATH}" || true
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
@@ -54,7 +54,7 @@ for namespace in $NAMESPACES; do
       label_selector="-l OWNER!=TILLER"
     fi
 
-    /kubectl --namespace="${namespace}" get --export -o=json "$type" "$label_selector" | jq --sort-keys \
+    /kubectl --namespace="${namespace}" get --export -o=json "$type" $label_selector | jq --sort-keys \
         'select(.type!="kubernetes.io/service-account-token") |
         del(
             .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",

@@ -13,6 +13,7 @@ Use the deployment example ([ssh](cronjob-ssh.yaml) or [AWS CodeCommit](cronjob-
 
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
+  * `GIT_PREFIX_PATH` - Path to the subdirectory in your repository. Default: `.`
   * `NAMESPACES` - List of namespaces to export. Default: all
   * `GLOBALRESOURCES` - List of global resource types to export. Default: `namespace`
   * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
