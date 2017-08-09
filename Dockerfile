@@ -16,7 +16,17 @@ RUN apk update && \
     python \
     py-yaml \
     py2-pip \
+    libstdc++ \
+    gpgme \
+    libressl-dev \
+    make \
+    g++ \
     && \
+  git clone https://github.com/AGWA/git-crypt.git && \
+  make --directory git-crypt && \
+  make --directory git-crypt install && \
+  rm -rf git-crypt && \
+  apk del libressl-dev make g++ && \
   rm -rf /var/cache/apk/*
 
 RUN curl -SL ${KUBECTL_URI} -o kubectl && chmod +x kubectl
