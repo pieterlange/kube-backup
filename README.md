@@ -16,10 +16,13 @@ Define the following environment parameters:
   * `GIT_PREFIX_PATH` - Path to the subdirectory in your repository. Default: `.`
   * `NAMESPACES` - List of namespaces to export. Default: all
   * `GLOBALRESOURCES` - List of global resource types to export. Default: `namespace`
-  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default.
+  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default (see [git-crypt section](#git-crypt) for details).
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
   * `GIT_BRANCH` - Use a specific git branch . Default: `master`
+  * `GITCRYPT_ENABLE` - Use git-crypt for data encryption. See [git-crypt section](#git-crypt) for details. Default: `false`
+  * `GITCRYPT_PRIVATE_KEY` - Path to private gpg key for git-crypt. See [git-crypt section](#git-crypt) for details. Default: `/secrets/gpg-private.key`
+  * `GITCRYPT_SYMMETRIC_KEY` - Path to shared symmetric key for git-crypt. See [git-crypt section](#git-crypt). Default: `/secrets/symmetric.key`
 
 Chose one of two authentication mechanisms:
 
@@ -62,6 +65,75 @@ Optional:
   * Modify the snapshot frequency in `spec.schedule` using the [cron format](https://en.wikipedia.org/wiki/Cron).
   * Modify the number of successful and failed finished jobs to retain in `spec.successfulJobsHistoryLimit` and `spec.failedJobsHistoryLimit`.
   * If using RBAC (1.6+), use the ClusterRole and ClusterRoleBindings in rbac.yaml.
+
+git-crypt
+---------
+For security reason `Secret` objects are not exported by default. However there is a possibility to store them safely using [git-crypt project](https://github.com/AGWA/git-crypt).
+
+#### Prerequisites
+Your repository have to be already initialized with git-crypt. Minimal configuration is listed below. For details and full information see [using git-crypt](https://github.com/AGWA/git-crypt#using-git-crypt).
+
+```
+cd repo
+git-crypt init
+cat <<EOF > .gitattributes
+secret.yaml filter=git-crypt diff=git-crypt
+.gitattributes !filter !diff
+EOF
+git-crypt add-gpg-user <USER_ID>
+git add -A
+git commit -a -m "initialize git-crypt"
+```
+
+Optional:
+  * You may choose any subdirectory for storing .gitattributes file (useful when using `GIT_PREFIX_PATH`).
+  * You may encrypt additional files than secret.yaml. Add additional line before .gitattribute filter. You may also use wildcard `*` to encrypt all files within chosen directory.
+
+#### Enable git-crypt
+To enable encryption feature:
+  * Set pod environment variable GITCRYPT_ENABLE to `true`
+    ```
+    spec:
+      containers:
+      - env:
+        - name: GITCRYPT_ENABLE
+          value: "true"
+    ```
+  * Create additional `Secret` object containing **either** gpg-private or symmetric key
+    ```
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: kube-backup-gpg
+      namespace: backups
+    data:
+      gpg-private.key: <base64_encoded_key>
+      symmetric.key: <base64_encoded_key>
+    ```
+  * Mount keys from `Secret` as additional volume
+    ```
+    spec:
+      containers:
+      - volumeMounts:
+        - mountPath: /secrets
+          name: gpgkey
+      volumes:
+      - name: gpgkey
+        secret:
+          defaultMode: 420
+          secretName: kube-backup-gpg
+    ```
+  * Add secret object name to `RESOURCETYPES` variable
+    ```
+    spec:
+      containers:
+      - env:
+        - name: RESOURCETYPES
+          value: "ingress deployment configmap secret svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"
+    ```
+
+  * (Optional): `$GITCRYPT_PRIVATE_KEY` and `$GITCRYPT_SYMMETRIC_KEY` variables are the combination of path where `Secret` volume is mounted and the name of item key from that object. If you change any value of them from the above example you may need to set this variables accordingly.
+
 
 Result
 ------

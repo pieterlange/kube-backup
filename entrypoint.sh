@@ -14,6 +14,9 @@ GIT_PREFIX_PATH="${GIT_PREFIX_PATH:-"."}"
 GIT_USERNAME="${GIT_USERNAME:-"kube-backup"}"
 GIT_EMAIL="${GIT_EMAIL:-"kube-backup@example.com"}"
 GIT_BRANCH="${GIT_BRANCH:-"master"}"
+GITCRYPT_ENABLE="${GITCRYPT_ENABLE:-"false"}"
+GITCRYPT_PRIVATE_KEY="${GITCRYPT_PRIVATE_KEY:-"/secrets/gpg-private.key"}"
+GITCRYPT_SYMMETRIC_KEY="${GITCRYPT_SYMMETRIC_KEY:-"/secrets/symmetric.key"}"
 
 if [[ ! -f /backup/.ssh/id_rsa ]] ; then
     git config --global credential.helper '!aws codecommit credential-helper $@'
@@ -25,6 +28,18 @@ git config --global user.email "$GIT_EMAIL"
 test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH"
 cd "$GIT_REPO_PATH"
 git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}"
+git stash
+if [ "$GITCRYPT_ENABLE" = "true" ]; then
+  if [ -f "$GITCRYPT_PRIVATE_KEY" ]; then
+    gpg --allow-secret-key-import --import "$GITCRYPT_PRIVATE_KEY"
+    git-crypt unlock
+  elif [ -f "$GITCRYPT_SYMMETRIC_KEY" ]; then
+    git-crypt unlock "$GITCRYPT_SYMMETRIC_KEY"
+  else
+    echo "[ERROR] Please verify your env variables (GITCRYPT_PRIVATE_KEY or GITCRYPT_SYMMETRIC_KEY)"
+    exit 1
+  fi
+fi
 git rm -r "${GIT_PREFIX_PATH}" || true
 
 # Start kubernetes state export
