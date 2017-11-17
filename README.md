@@ -105,7 +105,7 @@ To enable encryption feature:
     kind: Secret
     metadata:
       name: kube-backup-gpg
-      namespace: backups
+      namespace: kube-system
     data:
       gpg-private.key: <base64_encoded_key>
       symmetric.key: <base64_encoded_key>
