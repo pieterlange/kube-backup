@@ -131,6 +131,14 @@ To enable encryption feature:
         - name: RESOURCETYPES
           value: "ingress deployment configmap secret svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"
     ```
+  * If using RBAC (1.6+), add `secrets` to `resources`
+    ```
+    rules:
+    - apiGroups: ["*"]
+      resources: [
+        "configmaps",
+        "secrets",
+    ```
 
   * (Optional): `$GITCRYPT_PRIVATE_KEY` and `$GITCRYPT_SYMMETRIC_KEY` variables are the combination of path where `Secret` volume is mounted and the name of item key from that object. If you change any value of them from the above example you may need to set this variables accordingly.
 
