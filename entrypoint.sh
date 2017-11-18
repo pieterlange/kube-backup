@@ -40,7 +40,8 @@ if [ "$GITCRYPT_ENABLE" = "true" ]; then
     exit 1
   fi
 fi
-git rm -r "${GIT_PREFIX_PATH}" || true
+cd "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
+git rm -r **/*.yaml || true
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
