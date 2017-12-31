@@ -1,7 +1,7 @@
-FROM alpine:3.6
+FROM alpine:3.7
 
-ENV KUBECTL_VERSION 1.7.2
-ENV KUBECTL_SHA256 e0806c9fd584771e74df2bbffb3d07f34b429606056ca47de396ef063dc8ef71
+ENV KUBECTL_VERSION 1.8.4
+ENV KUBECTL_SHA256 fb3cbf25e71f414381e8a6b8a2dc2abb19344feea660ac0445ccf5d43a093f10
 ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
 
 RUN apk update && \
