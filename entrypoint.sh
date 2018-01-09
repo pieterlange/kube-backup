@@ -9,6 +9,8 @@ fi
 RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds crd networkpolicy statefulset storageclass cronjob"}"
 GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclasses"}"
 
+function join_by { local IFS="$1"; shift; echo "$*"; }
+
 # Initialize git repo
 [ -z "$DRY_RUN" ] && [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
 GIT_REPO_PATH="${GIT_REPO_PATH:-"/backup/git"}"
@@ -72,19 +74,26 @@ for namespace in $NAMESPACES; do
       label_selector="-l OWNER!=TILLER"
     fi
 
-    kubectl --namespace="${namespace}" get --export -o=json "$type" $label_selector | jq --sort-keys \
+    kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r a b name; do
+
+    kubectl --namespace="${namespace}" get --export -o=json "$type" "$name" | jq --sort-keys \
         'select(.type!="kubernetes.io/service-account-token") |
         del(
-            .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
-            .items[].metadata.annotations."control-plane.alpha.kubernetes.io/leader",
-            .items[].spec.clusterIP,
-            .items[].metadata.uid,
-            .items[].metadata.selfLink,
-            .items[].metadata.resourceVersion,
-            .items[].metadata.creationTimestamp,
-            .items[].metadata.generation,
-            .items[].status
-        )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${type}.yaml"
+            .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
+            .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+            .metadata.creationTimestamp,
+            .metadata.generation,
+            .metadata.resourceVersion,
+            .metadata.selfLink,
+            .metadata.uid,
+            .spec.clusterIP,
+            .spec.template.spec.dnsPolicy,
+            .spec.template.spec.restartPolicy,
+            .spec.template.spec.securityContext,
+            .spec.template.spec.terminationGracePeriodSeconds,
+            .status
+        )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${name}.${type}.yaml"
+  done
   done
 done
 
