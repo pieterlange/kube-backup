@@ -7,8 +7,6 @@ fi
 RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds crd networkpolicy statefulset storageclass cronjob"}"
 GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclasses"}"
 
-function join_by { local IFS="$1"; shift; echo "$*"; }
-
 # Initialize git repo
 [ -z "$DRY_RUN" ] && [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
 GIT_REPO_PATH="${GIT_REPO_PATH:-"/backup/git"}"
