@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 if [ -z "$NAMESPACES" ]; then
-  NAMESPACES=$(/kubectl get ns -o jsonpath={.items[*].metadata.name})
+  NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
 fi
 
 RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"}"
@@ -47,7 +47,7 @@ git rm -r **/*.yaml || true
 for resource in $GLOBALRESOURCES; do
   [ -d "$GIT_REPO_PATH/$GIT_PREFIX_PATH" ] || mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
   echo "Exporting resource: ${resource}" > /dev/stderr
-  /kubectl get --export -o=json "$resource" | jq --sort-keys \
+  kubectl get --export -o=json "$resource" | jq --sort-keys \
       'del(
           .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
           .items[].metadata.annotations."control-plane.alpha.kubernetes.io/leader",
@@ -70,7 +70,7 @@ for namespace in $NAMESPACES; do
       label_selector="-l OWNER!=TILLER"
     fi
 
-    /kubectl --namespace="${namespace}" get --export -o=json "$type" $label_selector | jq --sort-keys \
+    kubectl --namespace="${namespace}" get --export -o=json "$type" $label_selector | jq --sort-keys \
         'select(.type!="kubernetes.io/service-account-token") |
         del(
             .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
