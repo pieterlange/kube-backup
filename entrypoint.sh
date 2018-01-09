@@ -10,7 +10,7 @@ RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds crd netw
 GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclasses"}"
 
 # Initialize git repo
-[ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
+[ -z "$DRY_RUN" ] && [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
 GIT_REPO_PATH="${GIT_REPO_PATH:-"/backup/git"}"
 GIT_PREFIX_PATH="${GIT_PREFIX_PATH:-"."}"
 GIT_USERNAME="${GIT_USERNAME:-"kube-backup"}"
@@ -24,13 +24,13 @@ if [[ ! -f /backup/.ssh/id_rsa ]] ; then
     git config --global credential.helper '!aws codecommit credential-helper $@'
     git config --global credential.UseHttpPath true
 fi
-git config --global user.name "$GIT_USERNAME"
-git config --global user.email "$GIT_EMAIL"
+[ -z "$DRY_RUN" ] && git config --global user.name "$GIT_USERNAME"
+[ -z "$DRY_RUN" ] && git config --global user.email "$GIT_EMAIL"
 
-test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH"
+[ -z "$DRY_RUN" ] && ( test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH" )
 cd "$GIT_REPO_PATH"
-git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}"
-git stash
+[ -z "$DRY_RUN" ] && ( git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}" )
+[ -z "$DRY_RUN" ] && git stash
 if [ "$GITCRYPT_ENABLE" = "true" ]; then
   if [ -f "$GITCRYPT_PRIVATE_KEY" ]; then
     gpg --allow-secret-key-import --import "$GITCRYPT_PRIVATE_KEY"
@@ -87,6 +87,8 @@ for namespace in $NAMESPACES; do
         )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${type}.yaml"
   done
 done
+
+[ -z "$DRY_RUN" ] || exit
 
 git add .
 
