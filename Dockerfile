@@ -1,9 +1,5 @@
 FROM alpine:3.7
 
-ENV KUBECTL_VERSION 1.8.4
-ENV KUBECTL_SHA256 fb3cbf25e71f414381e8a6b8a2dc2abb19344feea660ac0445ccf5d43a093f10
-ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
-
 RUN apk update && \
   apk add --update \
     bash \
@@ -29,12 +25,17 @@ RUN apk update && \
   apk del libressl-dev make g++ && \
   rm -rf /var/cache/apk/*
 
-RUN curl -SL ${KUBECTL_URI} -o kubectl && chmod +x kubectl
-RUN echo "${KUBECTL_SHA256}  kubectl" | sha256sum -c - || exit 10
-ENV PATH="/:${PATH}"
-
 RUN pip install ijson awscli
 RUN adduser -h /backup -D backup
+
+ENV KUBECTL_VERSION 1.9.1
+ENV KUBECTL_SHA256 ec1abbc1b91fb23e00558c09892d053012c7581afe6e5a36cada3713b0b7c37b
+ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
+
+RUN curl -SL ${KUBECTL_URI} -o kubectl && chmod +x kubectl
+
+RUN echo "${KUBECTL_SHA256}  kubectl" | sha256sum -c - || exit 10
+ENV PATH="/:${PATH}"
 
 COPY entrypoint.sh /
 USER backup
