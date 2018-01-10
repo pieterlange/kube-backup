@@ -83,10 +83,6 @@ for namespace in $NAMESPACES; do
             .metadata.selfLink,
             .metadata.uid,
             .spec.clusterIP,
-            .spec.template.spec.dnsPolicy,
-            .spec.template.spec.restartPolicy,
-            .spec.template.spec.securityContext,
-            .spec.template.spec.terminationGracePeriodSeconds,
             .status
         )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${name}.${type}.yaml"
   done
