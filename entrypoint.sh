@@ -71,6 +71,7 @@ for namespace in $NAMESPACES; do
         fi
 
         kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r a b name; do
+            [ -z $name ] && continue
 
             kubectl --namespace="${namespace}" get --export -o=json "$type" "$name" | jq --sort-keys \
                 'select(.type!="kubernetes.io/service-account-token") |
