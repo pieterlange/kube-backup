@@ -73,7 +73,12 @@ for namespace in $NAMESPACES; do
         kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r a b name; do
             [ -z $name ] && continue
 
-            kubectl --namespace="${namespace}" get --export -o=json "$type" "$name" | jq --sort-keys \
+        # Service account tokens cannot be exported
+        if [[ "$type" == 'secret' && $(kubectl get -n "${namespace}" -o jsonpath="{.type}" secret "$name") == "kubernetes.io/service-account-token" ]]; then
+            continue
+        fi
+
+        kubectl --namespace="${namespace}" get --export -o=json "$type" "$name" | jq --sort-keys \
                 'select(.type!="kubernetes.io/service-account-token") |
         del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
