@@ -28,8 +28,8 @@ RUN apk update && \
 RUN pip install ijson awscli
 RUN adduser -h /backup -D backup
 
-ENV KUBECTL_VERSION 1.9.1
-ENV KUBECTL_SHA256 ec1abbc1b91fb23e00558c09892d053012c7581afe6e5a36cada3713b0b7c37b
+ENV KUBECTL_VERSION 1.9.3
+ENV KUBECTL_SHA256 81eb30e62a12d6e0527a6a3c2a9501b56d65777bf66684739b16a0afe826c8f8
 ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
 
 RUN curl -SL ${KUBECTL_URI} -o kubectl && chmod +x kubectl
