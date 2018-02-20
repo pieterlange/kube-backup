@@ -79,8 +79,7 @@ for namespace in $NAMESPACES; do
         fi
 
         kubectl --namespace="${namespace}" get --export -o=json "$type" "$name" | jq --sort-keys \
-                'select(.type!="kubernetes.io/service-account-token") |
-        del(
+        'del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
             .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
             .metadata.creationTimestamp,
