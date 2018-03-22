@@ -28,7 +28,9 @@ fi
 [ -z "$DRY_RUN" ] && (test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH")
 cd "$GIT_REPO_PATH"
 [ -z "$DRY_RUN" ] && (git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}")
-[ -z "$DRY_RUN" ] && git stash
+
+cd "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
+
 if [ "$GITCRYPT_ENABLE" = "true" ]; then
     if [ -f "$GITCRYPT_PRIVATE_KEY" ]; then
         gpg --allow-secret-key-import --import "$GITCRYPT_PRIVATE_KEY"
@@ -40,8 +42,8 @@ if [ "$GITCRYPT_ENABLE" = "true" ]; then
         exit 1
     fi
 fi
-cd "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
-git rm -r **/*.yaml || true
+
+[ -z "$DRY_RUN" ] && git rm -r '*.yaml' --ignore-unmatch -f
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
