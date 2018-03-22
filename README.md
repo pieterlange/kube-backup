@@ -1,6 +1,6 @@
 kube-backup
 ===========
-[![Docker Repository on Quay](https://quay.io/repository/digidentity/kube-backup/status "Docker Repository on Quay")](https://quay.io/repository/digidentity/kube-backup)
+[![Docker Repository on Quay](https://quay.io/repository/plange/kube-backup/status "Docker Repository on Quay")](https://quay.io/repository/plange/kube-backup)
 [![Docker Repository on Docker Hub](https://img.shields.io/docker/automated/ptlange/kube-backup.svg "Docker Repository on Docker Hub")](https://hub.docker.com/r/ptlange/kube-backup/)
 
 Quick 'n dirty kubernetes state backup script, designed to be ran as kubernetes Job. Think of it like [RANCID](http://www.shrubbery.net/rancid/) for kubernetes.
@@ -16,7 +16,7 @@ Define the following environment parameters:
   * `GIT_PREFIX_PATH` - Path to the subdirectory in your repository. Default: `.`
   * `NAMESPACES` - List of namespaces to export. Default: all
   * `GLOBALRESOURCES` - List of global resource types to export. Default: `namespace`
-  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default (see [git-crypt section](#git-crypt) for details).
+  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds customresourcedefinition networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default (see [git-crypt section](#git-crypt) for details).
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
   * `GIT_BRANCH` - Use a specific git branch . Default: `master`
@@ -24,9 +24,9 @@ Define the following environment parameters:
   * `GITCRYPT_PRIVATE_KEY` - Path to private gpg key for git-crypt. See [git-crypt section](#git-crypt) for details. Default: `/secrets/gpg-private.key`
   * `GITCRYPT_SYMMETRIC_KEY` - Path to shared symmetric key for git-crypt. See [git-crypt section](#git-crypt). Default: `/secrets/symmetric.key`
 
-Chose one of two authentication mechanisms:
+Choose one of two authentication mechanisms:
 
-  * If using AWS CodeCommit and policy-based access from AWS, modify your cluster configuration to provide GitPull and GitPush access for that CodeCommit repo to your cluster. If using `kops`, the configuration will look something like this:
+  * When using AWS CodeCommit and policy-based access from AWS, modify your cluster configuration to provide GitPull and GitPush access for that CodeCommit repo to your cluster. If using `kops`, the configuration will look something like this:
 
   ```yaml
     additionalPolicies:
@@ -46,7 +46,7 @@ Chose one of two authentication mechanisms:
   NOTE: in this deployment, the ssh volume and secret are not present.
 
 
-  * If using a different repository (GitHub, BitBucket, etc.), mount a configured ssh directory in `/backup/.ssh` with the following files:
+  * When using a different repository (GitHub, BitBucket, etc.), mount a configured ssh directory in `/backup/.ssh` with the following files:
 
     * `known_hosts` - Preloaded with SSH host key of `$GIT_REPO` host.
     * `id_rsa` - SSH private key of user allowed to push to `$GIT_REPO`.
@@ -68,10 +68,10 @@ Optional:
 
 git-crypt
 ---------
-For security reason `Secret` objects are not exported by default. However there is a possibility to store them safely using [git-crypt project](https://github.com/AGWA/git-crypt).
+For security reasons `Secret` objects are not exported by default. However there is a possibility to store them safely using the [git-crypt project](https://github.com/AGWA/git-crypt).
 
 #### Prerequisites
-Your repository have to be already initialized with git-crypt. Minimal configuration is listed below. For details and full information see [using git-crypt](https://github.com/AGWA/git-crypt#using-git-crypt).
+Your repository has to be already initialized with git-crypt. Minimal configuration is listed below. For details and full information see [using git-crypt](https://github.com/AGWA/git-crypt#using-git-crypt).
 
 ```
 cd repo
@@ -87,11 +87,11 @@ git commit -a -m "initialize git-crypt"
 
 Optional:
   * You may choose any subdirectory for storing .gitattributes file (useful when using `GIT_PREFIX_PATH`).
-  * You may encrypt additional files than secret.yaml. Add additional line before .gitattribute filter. You may also use wildcard `*` to encrypt all files within chosen directory.
+  * You may encrypt additional files other than secret.yaml. Add additional lines before the .gitattribute filter. You may also use wildcard `*` to encrypt all files within the directory.
 
 #### Enable git-crypt
 To enable encryption feature:
-  * Set pod environment variable GITCRYPT_ENABLE to `true`
+  * Set pod environment variable `GITCRYPT_ENABLE` to `true`
     ```
     spec:
       containers:
@@ -236,6 +236,6 @@ All configured resources will be exported into a directory tree structure in `ki
 
 3 directories, 80 files
 ```
-```
+
 -------
 This project is MIT licensed.

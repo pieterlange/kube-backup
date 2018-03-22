@@ -14,9 +14,10 @@ rules:
     "networkpolicies",
     "replicationcontrollers",
     "services",
+    "secrets",
     "statefulsets",
     "storageclasses",
-    "thirdpartyresources"
+    "customresourcedefinitions"
   ]
   verbs: ["get", "list"]
 
