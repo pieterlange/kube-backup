@@ -145,7 +145,7 @@ To enable encryption feature:
 
 Result
 ------
-All configured resources will be exported into a directory tree structure in `kind: List` YAML format following a `$namespace/$resourcetype.yaml` file structure.
+All configured resources will be exported into a directory tree structure in YAML format following a `$namespace/$name.$type.yaml` file structure.
 
 ```
 .
