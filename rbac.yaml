@@ -36,3 +36,10 @@ roleRef:
   kind: ClusterRole
   name: kube-backup-reader
   apiGroup: rbac.authorization.k8s.io
+  
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-backup
