@@ -43,3 +43,4 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-backup
+  namespace: kube-system
