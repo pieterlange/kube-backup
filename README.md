@@ -14,7 +14,8 @@ Use the deployment example ([ssh](cronjob-ssh.yaml) or [AWS CodeCommit](cronjob-
 Define the following environment parameters:
   * `GIT_REPO` - GIT repo url. **Required**
   * `GIT_PREFIX_PATH` - Path to the subdirectory in your repository. Default: `.`
-  * `RESOURCES` - **Required**. List of glob patterns `<+/-><resource type>:<namespace pattern>/<object pattern>`. The namespace is optional, e.g. `clusterrole:*`.   
+  * `RESOURCES` - **Required**. List of glob patterns `<+/-><resource type>:<namespace pattern>/<object pattern>`. The namespace is optional, e.g. `clusterrole:*`.
+    Only namespace and object name can contain glob patterns, the resource type can't. **You can use either single or plural form for resource type but be consistent!**
     For secrets consider to use [git-crypt section](#git-crypt). Note that Tiller's config maps also can contain secrets.
     Example: `deployments:*/* -deployments/*test*/* +deployments/testimonial/* configmaps:*/* -configmaps:tiller/* namespaces:*` - All deployments which aren't contain 'test' except 'testimonial', all configmaps outside of namespace tiller and all namespace definitions.
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
