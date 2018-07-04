@@ -27,7 +27,7 @@ spec:
           name: kube-backup
         spec:
           containers:
-          - image: ptlange/kube-backup:1.5.4
+          - image: ptlange/kube-backup:1.9.3-2
             imagePullPolicy: Always
             name: backup
             resources: {}
