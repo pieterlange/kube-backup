@@ -6,10 +6,20 @@ rules:
 - apiGroups: ["*"]
   resources: [
     "configmaps",
+    "certificates",
     "cronjobs",
+    "customresourcedefinitions",
     "deployments",
     "daemonsets",
     "ingresses",
+    "issuers",
+    "clusterissuers",
+    "clusterroles",
+    "clusterrolebindings",
+    "elasticsearchclusters",
+    "prometheuses",
+    "servicemonitors",
+    "alertmanagers",
     "namespaces",
     "networkpolicies",
     "replicationcontrollers",
@@ -17,7 +27,11 @@ rules:
     "secrets",
     "statefulsets",
     "storageclasses",
-    "customresourcedefinitions"
+    "persistentvolumeclaims",
+    "roles",
+    "rolebindings",
+    "statefulsets",
+    "storageclasses"
   ]
   verbs: ["get", "list"]
 

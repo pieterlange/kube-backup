@@ -35,7 +35,7 @@ spec:
             - name: GIT_REPO
               value: "git@git.example.com:infra/kube-backup.git"
             - name: RESOURCETYPES
-              value: "ingress deployment configmap svc rc ds thirdpartyresource networkpolicy statefulset storageclass cronjob"
+              value: "ingress deployment configmap svc rc ds customresourcedefinition networkpolicy statefulset storageclass cronjob"
             volumeMounts:
             - mountPath: /backup/
               name: cache

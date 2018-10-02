@@ -4,8 +4,8 @@ if [ -z "$NAMESPACES" ]; then
     NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
 fi
 
-RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds crd networkpolicy statefulset storageclass cronjob"}"
-GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclasses"}"
+RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds networkpolicy statefulset cronjob pvc"}"
+GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclass clusterrole clusterrolebinding clusterissuer customresourcedefinition"}"
 
 # Initialize git repo
 [ -z "$DRY_RUN" ] && [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
@@ -49,7 +49,7 @@ fi
 for resource in $GLOBALRESOURCES; do
     [ -d "$GIT_REPO_PATH/$GIT_PREFIX_PATH" ] || mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
     echo "Exporting resource: ${resource}" >/dev/stderr
-    kubectl get --export -o=json "$resource" | jq --sort-keys \
+    kubectl get -o=json "$resource" | jq --sort-keys \
         'del(
           .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
           .items[].metadata.annotations."control-plane.alpha.kubernetes.io/leader",
@@ -80,7 +80,7 @@ for namespace in $NAMESPACES; do
             continue
         fi
 
-        kubectl --namespace="${namespace}" get --export -o=json "$type" "$name" | jq --sort-keys \
+        kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
         'del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
             .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
