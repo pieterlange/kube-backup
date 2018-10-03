@@ -29,6 +29,7 @@ fi
 cd "$GIT_REPO_PATH"
 [ -z "$DRY_RUN" ] && (git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}")
 
+mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
 cd "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
 
 if [ "$GITCRYPT_ENABLE" = "true" ]; then
