@@ -77,7 +77,7 @@ Your repository has to be already initialized with git-crypt. Minimal configurat
 cd repo
 git-crypt init
 cat <<EOF > .gitattributes
-*.secret.yaml filter=git-crypt diff=git-crypt
+*.secrets.yaml filter=git-crypt diff=git-crypt
 .gitattributes !filter !diff
 EOF
 git-crypt add-gpg-user <USER_ID>
