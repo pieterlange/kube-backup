@@ -99,6 +99,7 @@ done
 
 [ -z "$DRY_RUN" ] || exit
 
+cd "${KUBE_BACKUP}"
 git add .
 
 if ! git diff-index --quiet HEAD --; then
