@@ -99,6 +99,7 @@ done
 
 [ -z "$DRY_RUN" ] || exit
 
+cd "${GIT_REPO_PATH}"
 git add .
 
 if ! git diff-index --quiet HEAD --; then
