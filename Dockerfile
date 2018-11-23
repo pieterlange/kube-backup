@@ -17,6 +17,7 @@ RUN apk update && \
     libressl-dev \
     make \
     g++ \
+    tzdata \
     && \
   git clone https://github.com/AGWA/git-crypt.git && \
   make --directory git-crypt && \
