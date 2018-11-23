@@ -1,5 +1,20 @@
 #!/bin/bash -e
 
+KUBERNETES_API="${KUBERNETES_API:-"https://kubernetes.default.svc.cluster.local"}"
+
+release=$(curl $KUBERNETES_API/version -sk | grep gitVersion | cut -d ':' -f 2 | tr -d '"' | tr -d ',' | tr -d ' ')
+[ -z "$release" ] && echo "Unable to get Kubernetes version from cluster" && exit 1
+
+echo "Kubernetes release version set to $release - downloading kubectl"
+curl -sL https://storage.googleapis.com/kubernetes-release/release/${release}/bin/linux/amd64/kubectl -o /opt/kubectl
+chmod +x /opt/kubectl
+
+kubectl version || exit
+
+if [ -f /var/run/secrets/kubernetes.io/serviceaccount/token ]; then
+	kubectl config set-credentials sa-user --token=$(</var/run/secrets/kubernetes.io/serviceaccount/token)
+fi
+
 if [ -z "$NAMESPACES" ]; then
     NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
 fi

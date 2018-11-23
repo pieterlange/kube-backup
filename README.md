@@ -12,6 +12,7 @@ Setup
 Use the deployment example ([ssh](cronjob-ssh.yaml) or [AWS CodeCommit](cronjob-codecommit.yaml) authentication) and deploy a kubernetes `CronJob` primitive in your kubernetes (1.5 and up) cluster ensuring backups of kubernetes resource definitions to your private git repo.
 
 Define the following environment parameters:
+  * `KUBERNETES_API` - URL to Kubernetes API. Default: `https://kubernetes.default.svc.cluster.local` **Required**
   * `GIT_REPO` - GIT repo url. **Required**
   * `GIT_PREFIX_PATH` - Path to the subdirectory in your repository. Default: `.`
   * `NAMESPACES` - List of namespaces to export. Default: all
