@@ -15,7 +15,7 @@ metadata:
     app: kube-backup
 spec:
   schedule: "*/10 * * * *"
-  concurrencyPolicy: Replace
+  concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:
