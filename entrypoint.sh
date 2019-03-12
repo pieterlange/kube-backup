@@ -81,7 +81,7 @@ for namespace in $NAMESPACES; do
             continue
         fi
 
-        kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
+        kubectl --namespace="${namespace}" get -o=json "$name" | jq --sort-keys \
         'del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
             .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
