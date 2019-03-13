@@ -27,7 +27,7 @@ spec:
           name: kube-backup
         spec:
           containers:
-          - image: quay.io/plange/kube-backup:1.12.0-1
+          - image: eu.gcr.io/gpp-dev/rms/kube-backup:1.12.3
             imagePullPolicy: Always
             name: backup
             resources: {}
