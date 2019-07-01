@@ -16,7 +16,7 @@ Define the following environment parameters:
   * `GIT_PREFIX_PATH` - Path to the subdirectory in your repository. Default: `.`
   * `NAMESPACES` - List of namespaces to export. Default: all
   * `GLOBALRESOURCES` - List of global resource types to export. Default: `namespace`
-  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds customresourcedefinition networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default (see [git-crypt section](#git-crypt) for details).
+  * `RESOURCETYPES` - List of resource types to export. Default: `ingress deployment configmap svc rc ds networkpolicy statefulset storageclass cronjob`. Notice that `Secret` objects are intentionally not exported by default (see [git-crypt section](#git-crypt) for details).
   * `GIT_USERNAME` - Display name of git user. Default: `kube-backup`
   * `GIT_EMAIL` - Email address of git user. Default: `kube-backup@example.com`
   * `GIT_BRANCH` - Use a specific git branch . Default: `master`
