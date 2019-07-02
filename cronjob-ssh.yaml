@@ -31,6 +31,8 @@ spec:
             imagePullPolicy: Always
             name: backup
             resources: {}
+            securityContext:
+              runAsUser: 1000
             env:
             - name: GIT_REPO
               value: "git@git.example.com:infra/kube-backup.git"
