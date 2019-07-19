@@ -74,8 +74,8 @@ for namespace in $NAMESPACES; do
         fi
 
         kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r a b name; do
+            [[ "${SKIP_RESOURCE,,}" =~ "${namespace,,}/${type,,}/${name,,}" ]] && continue
             [ -z $name ] && continue
-
         # Service account tokens cannot be exported
         if [[ "$type" == 'secret' && $(kubectl get -n "${namespace}" -o jsonpath="{.type}" secret "$name") == "kubernetes.io/service-account-token" ]]; then
             continue
