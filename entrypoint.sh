@@ -114,12 +114,20 @@ for objectKey in ${!selectedObjects[@]}; do
         'del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
             .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+            .metadata.annotations."pv.kubernetes.io/bind-completed",
+            .metadata.annotations."pv.kubernetes.io/bound-by-controller",
+            .metadata.annotations."volume.beta.kubernetes.io/storage-provisioner",
+            .metadata.finalizers,
             .metadata.creationTimestamp,
             .metadata.generation,
             .metadata.resourceVersion,
             .metadata.selfLink,
             .metadata.uid,
             .spec.clusterIP,
+            .spec.storageClassName,
+            .spec.volumeMode,
+            .spec.volumeName,
+            .secrets,
         .status
     )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' > "$fileName"
 done
