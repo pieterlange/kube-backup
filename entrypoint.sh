@@ -61,7 +61,7 @@ for resource in $GLOBALRESOURCES; do
           .items[].metadata.resourceVersion,
           .items[].metadata.creationTimestamp,
           .items[].metadata.generation
-      )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
+      )' | /bin/reflow.py >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
 done
 
 for namespace in $NAMESPACES; do
