@@ -25,7 +25,8 @@ fi
 [ -z "$DRY_RUN" ] && git config --global user.name "$GIT_USERNAME"
 [ -z "$DRY_RUN" ] && git config --global user.email "$GIT_EMAIL"
 
-[ -z "$DRY_RUN" ] && (test -d "$GIT_REPO_PATH" || git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH")
+[ -z "$DRY_RUN" ] && (test ! -e "$GIT_REPO_PATH" || rm -rf ${GIT_REPO_PATH})
+[ -z "$DRY_RUN" ] && (git clone --depth 1 "$GIT_REPO" "$GIT_REPO_PATH" --branch "$GIT_BRANCH" || git clone "$GIT_REPO" "$GIT_REPO_PATH")
 cd "$GIT_REPO_PATH"
 [ -z "$DRY_RUN" ] && (git checkout "${GIT_BRANCH}" || git checkout -b "${GIT_BRANCH}")
 
