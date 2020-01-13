@@ -14,15 +14,8 @@ RUN apk update && \
     py2-pip \
     libstdc++ \
     gpgme \
-    libressl-dev \
-    make \
-    g++ \
+    git-crypt \
     && \
-  git clone https://github.com/AGWA/git-crypt.git && \
-  make --directory git-crypt && \
-  make --directory git-crypt install && \
-  rm -rf git-crypt && \
-  apk del libressl-dev make g++ && \
   rm -rf /var/cache/apk/*
 
 RUN pip install ijson awscli
