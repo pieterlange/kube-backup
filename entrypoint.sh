@@ -4,8 +4,10 @@ if [ -z "$NAMESPACES" ]; then
     NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
 fi
 
-RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds networkpolicy statefulset cronjob pvc"}"
-GLOBALRESOURCES="${GLOBALRESOURCES:-"namespace storageclass clusterrole clusterrolebinding customresourcedefinition"}"
+DEFAULT_RESOURCETYPES="${DEFAULT_RESOURCETYPES:-"ingress deployment configmap svc rc ds networkpolicy statefulset cronjob pvc serviceaccount"}"
+RESOURCETYPES="${DEFAULT_RESOURCETYPES} ${EXTRA_RESOURCETYPES}"
+DEFAULT_GLOBALRESOURCES="${DEFAULT_GLOBALRESOURCES:-"namespace storageclass clusterrole clusterrolebinding customresourcedefinition"}"
+GLOBALRESOURCES="${DEFAULT_GLOBALRESOURCES} ${EXTRA_GLOBALRESOURCES}"
 
 # Initialize git repo
 [ -z "$DRY_RUN" ] && [ -z "$GIT_REPO" ] && echo "Need to define GIT_REPO environment variable" && exit 1
@@ -59,7 +61,7 @@ for resource in $GLOBALRESOURCES; do
           .items[].metadata.resourceVersion,
           .items[].metadata.creationTimestamp,
           .items[].metadata.generation
-      )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
+      )' | /bin/reflow.py >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
 done
 
 for namespace in $NAMESPACES; do
@@ -81,6 +83,7 @@ for namespace in $NAMESPACES; do
             continue
         fi
 
+        OUTFILE="$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${name}.${type}.yaml"
         kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
         'del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
@@ -90,9 +93,8 @@ for namespace in $NAMESPACES; do
             .metadata.resourceVersion,
             .metadata.selfLink,
             .metadata.uid,
-            .spec.clusterIP,
             .status
-        )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${name}.${type}.yaml"
+        )' | /bin/reflow.py >"${OUTFILE}"
         done
     done
 done
