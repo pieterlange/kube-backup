@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-backup
+  namespace: kube-system
+
+---
+
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: kube-state-backup
+  namespace: kube-system
+  labels:
+    app: kube-backup
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Replace
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: kube-backup
+          name: kube-backup
+        spec:
+          containers:
+          - image: quay.io/plange/kube-backup:1.12.0-1
+            imagePullPolicy: Always
+            name: backup
+            resources: {}
+            env:
+            - name: GIT_REPO
+              value: "https://source.developers.google.com/p/[PROJECT_ID]/r/[REPO]"
+            volumeMounts:
+            - mountPath: /backup/
+              name: cache
+            - mountPath: /backup/.gitcookies
+              name: gitcookies
+              subPath: .gitcookies
+          dnsPolicy: ClusterFirst
+          terminationGracePeriodSeconds: 30
+          serviceAccountName: kube-backup
+          volumes:
+          - name: gitcookies
+            secret:
+              defaultMode: 292
+              optional: false
+              secretName: kube-backup-gitcookies
+          - name: cache
+            emptyDir: {}
+          restartPolicy: OnFailure

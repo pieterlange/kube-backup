@@ -18,10 +18,15 @@ GITCRYPT_ENABLE="${GITCRYPT_ENABLE:-"false"}"
 GITCRYPT_PRIVATE_KEY="${GITCRYPT_PRIVATE_KEY:-"/secrets/gpg-private.key"}"
 GITCRYPT_SYMMETRIC_KEY="${GITCRYPT_SYMMETRIC_KEY:-"/secrets/symmetric.key"}"
 
-if [[ ! -f /backup/.ssh/id_rsa ]]; then
+if [[ -f /backup/.ssh/id_rsa ]]; then
+elif [[ -f /backup/.gitcookies ]]; then
+    git config --global http.cookiefile /backup/.gitcookies
+else
     git config --global credential.helper '!aws codecommit credential-helper $@'
     git config --global credential.UseHttpPath true
 fi
+
+
 [ -z "$DRY_RUN" ] && git config --global user.name "$GIT_USERNAME"
 [ -z "$DRY_RUN" ] && git config --global user.email "$GIT_EMAIL"
 
