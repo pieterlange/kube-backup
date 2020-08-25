@@ -81,6 +81,11 @@ for namespace in $NAMESPACES; do
             continue
         fi
 
+        # bil: workaround to exclude cluster-autoscaler-status.configmap.yml as it produces noise everytime
+        if [[ "$type" == 'configmap' && "${namespace}" == 'kube-system' && "$name" == 'cluster-autoscaler-status' ]]; then
+            continue
+        fi
+
         kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
         'del(
             .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
