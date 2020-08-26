@@ -14,9 +14,9 @@ RUN apk update && \
     py2-pip \
     libstdc++ \
     gpgme \
-    git-crypt \
-    && \
-  rm -rf /var/cache/apk/*
+    git-crypt
+
+RUN rm -rf /var/cache/apk/*
 
 RUN pip install ijson awscli
 RUN adduser -h /backup -D backup
