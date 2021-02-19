@@ -53,7 +53,6 @@ fi
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
-    mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
     echo "Exporting resource: ${resource}" >&2
     kubectl get -o=json "$resource" | jq --sort-keys \
         'del(
