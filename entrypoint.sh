@@ -1,5 +1,10 @@
 #!/bin/sh -e
 
+if [ -n "$1" ]; then
+    exec "$@"
+    exit
+fi
+
 if [ -z "$NAMESPACES" ]; then
     NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
 fi
