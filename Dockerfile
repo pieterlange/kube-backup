@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:3.14
 
 RUN apk update && \
   apk add --update \
@@ -9,9 +9,9 @@ RUN apk update && \
     curl \
     ca-certificates \
     jq \
-    python \
-    py-yaml \
-    py2-pip \
+    python3 \
+    py3-yaml \
+    py3-pip \
     libstdc++ \
     gpgme \
     git-crypt \
