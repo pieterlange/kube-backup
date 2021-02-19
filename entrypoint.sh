@@ -48,7 +48,7 @@ fi
 
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
-    [ -d "$GIT_REPO_PATH/$GIT_PREFIX_PATH" ] || mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
+    mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
     echo "Exporting resource: ${resource}" >&2
     kubectl get -o=json "$resource" | jq --sort-keys \
         'del(
@@ -63,7 +63,7 @@ for resource in $GLOBALRESOURCES; do
 done
 
 for namespace in $NAMESPACES; do
-    [ -d "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}" ] || mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}"
+    mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}"
 
     for type in $RESOURCETYPES; do
         echo "[${namespace}] Exporting resources: ${type}" >&2
