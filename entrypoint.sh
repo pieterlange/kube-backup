@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/sh -e
 
 if [ -z "$NAMESPACES" ]; then
     NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
@@ -18,7 +18,7 @@ GITCRYPT_ENABLE="${GITCRYPT_ENABLE:-"false"}"
 GITCRYPT_PRIVATE_KEY="${GITCRYPT_PRIVATE_KEY:-"/secrets/gpg-private.key"}"
 GITCRYPT_SYMMETRIC_KEY="${GITCRYPT_SYMMETRIC_KEY:-"/secrets/symmetric.key"}"
 
-if [[ ! -f /backup/.ssh/id_rsa ]]; then
+if [ ! -f /backup/.ssh/id_rsa ]; then
     git config --global credential.helper '!aws codecommit credential-helper $@'
     git config --global credential.UseHttpPath true
 fi
@@ -49,7 +49,7 @@ fi
 # Start kubernetes state export
 for resource in $GLOBALRESOURCES; do
     [ -d "$GIT_REPO_PATH/$GIT_PREFIX_PATH" ] || mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH"
-    echo "Exporting resource: ${resource}" >/dev/stderr
+    echo "Exporting resource: ${resource}" >&2
     kubectl get -o=json "$resource" | jq --sort-keys \
         'del(
           .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
@@ -66,10 +66,10 @@ for namespace in $NAMESPACES; do
     [ -d "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}" ] || mkdir -p "$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}"
 
     for type in $RESOURCETYPES; do
-        echo "[${namespace}] Exporting resources: ${type}" >/dev/stderr
+        echo "[${namespace}] Exporting resources: ${type}" >&2
 
         label_selector=""
-        if [[ "$type" == 'configmap' && -z "${INCLUDE_TILLER_CONFIGMAPS:-}" ]]; then
+        if [ "$type" = 'configmap' ] && [ -z "${INCLUDE_TILLER_CONFIGMAPS:-}" ]; then
             label_selector="-l OWNER!=TILLER"
         fi
 
@@ -77,7 +77,7 @@ for namespace in $NAMESPACES; do
             [ -z "$name" ] && continue
 
         # Service account tokens cannot be exported
-        if [[ "$type" == 'secret' && $(kubectl get -n "${namespace}" -o jsonpath="{.type}" secret "$name") == "kubernetes.io/service-account-token" ]]; then
+        if [ "$type" = 'secret' ] && [ "$(kubectl get -n "${namespace}" -o jsonpath="{.type}" secret "$name")" = "kubernetes.io/service-account-token" ]; then
             continue
         fi
 
