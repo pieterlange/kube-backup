@@ -21,14 +21,13 @@ RUN apk update && \
 RUN pip install ijson awscli
 RUN adduser -h /backup -D backup
 
-ENV KUBECTL_VERSION 1.17.0
-ENV KUBECTL_SHA256 6e0aaaffe5507a44ec6b1b8a0fb585285813b78cc045f8804e70a6aac9d1cb4c
-ENV KUBECTL_URI https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl
+ARG KUBECTL_VERSION="1.17.0"
+ARG KUBECTL_SHA256="6e0aaaffe5507a44ec6b1b8a0fb585285813b78cc045f8804e70a6aac9d1cb4c"
 
-RUN curl -SL ${KUBECTL_URI} -o kubectl && chmod +x kubectl
-
-RUN echo "${KUBECTL_SHA256}  kubectl" | sha256sum -c - || exit 10
-ENV PATH="/:${PATH}"
+RUN curl -SL \
+  "https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl && \
+  chmod +x /usr/local/bin/kubectl
+RUN echo "${KUBECTL_SHA256}  /usr/local/bin/kubectl" | sha256sum -c - || exit 10
 
 COPY entrypoint.sh /
 USER backup
