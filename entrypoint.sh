@@ -56,14 +56,14 @@ for resource in $GLOBALRESOURCES; do
     echo "Exporting resource: ${resource}" >&2
     kubectl get -o=json "$resource" | jq --sort-keys \
         'del(
-          .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
-          .items[].metadata.annotations."control-plane.alpha.kubernetes.io/leader",
-          .items[].metadata.uid,
-          .items[].metadata.selfLink,
-          .items[].metadata.resourceVersion,
-          .items[].metadata.creationTimestamp,
-          .items[].metadata.generation
-      )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
+            .items[].metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+            .items[].metadata.annotations."control-plane.alpha.kubernetes.io/leader",
+            .items[].metadata.uid,
+            .items[].metadata.selfLink,
+            .items[].metadata.resourceVersion,
+            .items[].metadata.creationTimestamp,
+            .items[].metadata.generation
+        )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
 done
 
 for namespace in $NAMESPACES; do
@@ -80,23 +80,23 @@ for namespace in $NAMESPACES; do
         kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r a b name; do
             [ -z "$name" ] && continue
 
-        # Service account tokens cannot be exported
-        if [ "$type" = 'secret' ] && [ "$(kubectl get -n "${namespace}" -o jsonpath="{.type}" secret "$name")" = "kubernetes.io/service-account-token" ]; then
-            continue
-        fi
+            # Service account tokens cannot be exported
+            if [ "$type" = 'secret' ] && [ "$(kubectl get -n "${namespace}" -o jsonpath="{.type}" secret "$name")" = "kubernetes.io/service-account-token" ]; then
+                continue
+            fi
 
-        kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
-        'del(
-            .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
-            .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
-            .metadata.creationTimestamp,
-            .metadata.generation,
-            .metadata.resourceVersion,
-            .metadata.selfLink,
-            .metadata.uid,
-            .spec.clusterIP,
-            .status
-        )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${name}.${type}.yaml"
+            kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
+            'del(
+                .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
+                .metadata.annotations."kubectl.kubernetes.io/last-applied-configuration",
+                .metadata.creationTimestamp,
+                .metadata.generation,
+                .metadata.resourceVersion,
+                .metadata.selfLink,
+                .metadata.uid,
+                .spec.clusterIP,
+                .status
+            )' | python -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${namespace}/${name}.${type}.yaml"
         done
     done
 done
