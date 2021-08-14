@@ -6,7 +6,7 @@ if [ -n "$1" ]; then
 fi
 
 if [ -z "$NAMESPACES" ]; then
-    NAMESPACES=$(kubectl get ns -o jsonpath={.items[*].metadata.name})
+    NAMESPACES=$(kubectl get ns -o jsonpath='{.items[*].metadata.name}')
 fi
 
 RESOURCETYPES="${RESOURCETYPES:-"ingress deployment configmap svc rc ds networkpolicy statefulset cronjob pvc"}"
@@ -77,7 +77,8 @@ for namespace in $NAMESPACES; do
             label_selector="-l OWNER!=TILLER"
         fi
 
-        kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r a b name; do
+        # shellcheck disable=SC2086
+        kubectl --namespace="${namespace}" get "$type" $label_selector -o custom-columns=SPACE:.metadata.namespace,KIND:..kind,NAME:.metadata.name --no-headers | while read -r _ _ name; do
             [ -z "$name" ] && continue
 
             # Service account tokens cannot be exported
