@@ -64,7 +64,8 @@ for resource in $GLOBALRESOURCES; do
             .items[].metadata.creationTimestamp,
             .items[].metadata.generation,
             .items[].metadata.managedFields,
-            .items[].status
+            .items[].status,
+            .metadata
         )' | python3 -c 'import sys, yaml, json; yaml.safe_dump(json.load(sys.stdin), sys.stdout, default_flow_style=False)' >"$GIT_REPO_PATH/$GIT_PREFIX_PATH/${resource}.yaml"
 done
 
