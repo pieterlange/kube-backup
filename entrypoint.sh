@@ -88,6 +88,11 @@ for namespace in $NAMESPACES; do
                 continue
             fi
 
+            # Skip kube-root-ca.crt config maps
+            if [ "$type" = 'configmap' ] && [ "$name" = 'kube-root-ca.crt' ]; then
+                continue
+            fi
+
             kubectl --namespace="${namespace}" get -o=json "$type" "$name" | jq --sort-keys \
             'del(
                 .metadata.annotations."control-plane.alpha.kubernetes.io/leader",
