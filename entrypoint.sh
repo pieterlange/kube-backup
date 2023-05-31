@@ -14,9 +14,14 @@ GIT_PREFIX_PATH="${GIT_PREFIX_PATH:-"."}"
 GIT_USERNAME="${GIT_USERNAME:-"kube-backup"}"
 GIT_EMAIL="${GIT_EMAIL:-"kube-backup@example.com"}"
 GIT_BRANCH="${GIT_BRANCH:-"master"}"
+GIT_INSECURE_TLS="${GIT_INSECURE_TLS:-"false"}"
 GITCRYPT_ENABLE="${GITCRYPT_ENABLE:-"false"}"
 GITCRYPT_PRIVATE_KEY="${GITCRYPT_PRIVATE_KEY:-"/secrets/gpg-private.key"}"
 GITCRYPT_SYMMETRIC_KEY="${GITCRYPT_SYMMETRIC_KEY:-"/secrets/symmetric.key"}"
+
+if [ "$GIT_INSECURE_TLS" = "true" ]; then
+    git config --global http.sslVerify "false"
+fi
 
 if [[ ! -f /backup/.ssh/id_rsa ]]; then
     git config --global credential.helper '!aws codecommit credential-helper $@'
